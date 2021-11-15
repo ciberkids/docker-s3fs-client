@@ -34,8 +34,8 @@ if [ -n "${AWS_S3_SECRET_ACCESS_KEY}" ]; then
 fi
 
 # Create destination directory if it does not exist.
-if [ ! -d $DEST ]; then
-    mkdir -p $DEST
+if [ ! -d ${DEST} ]; then
+    mkdir -p ${DEST}
 fi
 
 GROUP_NAME=$(getent group "${GID}" | cut -d":" -f1)
@@ -47,36 +47,46 @@ if [ $GID -gt 0 -a -z "${GROUP_NAME}" ]; then
 fi
 
 # Add a user
-if [ $UID -gt 0 ]; then
+if [ ${UID} -gt 0 ]; then
     adduser -u $UID -D -G $GROUP_NAME $UID
-    RUN_AS=$UID
-    chown $UID:$GID $AWS_S3_MOUNT
-    chown $UID:$GID ${AWS_S3_AUTHFILE}
-    chown $UID:$GID /opt/s3fs
+    RUN_AS=${UID}
+    chown ${UID}:${GID} ${AWS_S3_MOUNT}
+    chown ${UID}:${GID} ${AWS_S3_AUTHFILE}
+    chown ${UID}:${GID} /opt/s3fs
 fi
 
 # Debug options
 DEBUG_OPTS=
-if [ $S3FS_DEBUG = "1" ]; then
-    DEBUG_OPTS="-d -d"
+if [ ${S3FS_DEBUG} = "1" ]; then
+    export DEBUG_OPTS="-d -d"
 fi
 
 # Additional S3FS options
 if [ -n "$S3FS_ARGS" ]; then
-    S3FS_ARGS="-o $S3FS_ARGS"
+    export S3FS_ARGS="-o $S3FS_ARGS"
 fi
 
 # Mount and verify that something is present. davfs2 always creates a lost+found
 # sub-directory, so we can use the presence of some file/dir as a marker to
 # detect that mounting was a success. Execute the command on success.
+if [ -n "${AWS_IAM_ROLE}" ]; then
 
-su - $RUN_AS -c "s3fs $DEBUG_OPTS ${S3FS_ARGS} \
-    -o passwd_file=${AWS_S3_AUTHFILE} \
-    -o url=${AWS_S3_URL} \
-    -o uid=$UID \
-    -o gid=$GID \
-    ${AWS_S3_BUCKET} ${AWS_S3_MOUNT}"
+    su - ${RUN_AS} -c "s3fs ${DEBUG_OPTS} ${S3FS_ARGS} \
+        -o passwd_file=${AWS_S3_AUTHFILE} \
+        -o url=${AWS_S3_URL} \
+        -o uid=${UID} \
+        -o gid=${GID} \
+        ${AWS_S3_BUCKET} ${AWS_S3_MOUNT}"
+else 
 
+    su - ${RUN_AS} -c "s3fs ${DEBUG_OPTS} ${S3FS_ARGS} \
+        -o iam_role=${AWS_IAM_ROLE} \
+        -o url=${AWS_S3_URL} \
+        -o uid=${UID} \
+        -o gid=${GID} \
+        ${AWS_S3_BUCKET} ${AWS_S3_MOUNT}"
+
+fi
 # s3fs can claim to have a mount even though it didn't succeed.
 # Doing an operation actually forces it to detect that and remove the mount.
 ls "${AWS_S3_MOUNT}"
