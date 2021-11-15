@@ -72,6 +72,9 @@ parametrise the container:
   If that variable existed, it will be disregarded. This makes it easy to pass
   passwords using Docker [secrets]. This is only ever used whenever
   `AWS_S3_AUTHFILE` is empty.
+* `AWS_IAM_ROLE` is the role that we have to use with s3 if this is present only this one will be 
+  used and the AWS_S3_ACCESS_KEY_ID AWS_S3_SECRET_ACCESS_KEY will be ingnored 
+  we suggest to use: AWS_IAM_ROLE=$(curl http://169.254.169.254/latest/meta-data/iam/security-credentials/)
 * `AWS_S3_URL` is the URL to the Amazon service. This can be used to mount
   external services that implement a compatible API.
 * `AWS_S3_MOUNT` is the location within the container where to mounte the
