@@ -14,6 +14,7 @@ RUN apk --no-cache add \
     libressl-dev \
     mailcap \
     fuse-dev \
+    sudo \
     curl-dev && \
   git clone https://github.com/s3fs-fuse/s3fs-fuse.git && \
   cd s3fs-fuse && \
@@ -23,17 +24,9 @@ RUN apk --no-cache add \
   make -j && \
   make install
 
-FROM alpine
+FROM build
 
 # Metadata
-LABEL MAINTAINER efrecon+github@gmail.com
-LABEL org.opencontainers.image.title="efrecon/s3fs"
-LABEL org.opencontainers.image.description="Mount S3 buckets from within a container and expose them to host/containers"
-LABEL org.opencontainers.image.authors="Emmanuel Frécon <efrecon+github@gmail.com>"
-LABEL org.opencontainers.image.url="https://github.com/efrecon/docker-s3fs-client"
-LABEL org.opencontainers.image.documentation="https://github.com/efrecon/docker-s3fs-client/README.md"
-LABEL org.opencontainers.image.source="https://github.com/efrecon/docker-s3fs-client/Dockerfile"
-
 COPY --from=build /usr/bin/s3fs /usr/bin/s3fs
 
 # Specify URL and secrets. When using AWS_S3_SECRET_ACCESS_KEY_FILE, the secret
