@@ -5,7 +5,7 @@ export DEST=${AWS_S3_MOUNT:-/opt/s3fs/bucket}
 
 # Check variables and defaults
 if [ -z "${AWS_S3_ACCESS_KEY_ID}" \
--a -z "${AWS_S3_SECRET_ACCESS_KEY}" \ 
+-a -z "${AWS_S3_SECRET_ACCESS_KEY}" \
 -a -z "${AWS_S3_SECRET_ACCESS_KEY_FILE}" \
 -a -z "${AWS_S3_AUTHFILE}" \
 -a -z "${AWS_S3_SESSION_TOKEN}" \
