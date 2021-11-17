@@ -15,6 +15,7 @@ RUN apk --no-cache add \
     mailcap \
     fuse-dev \
     sudo \
+    jq \
     curl-dev && \
   git clone https://github.com/s3fs-fuse/s3fs-fuse.git && \
   cd s3fs-fuse && \
@@ -34,11 +35,12 @@ COPY --from=build /usr/bin/s3fs /usr/bin/s3fs
 # using Docker secrets. You can either specify the path to an authorisation
 # file, set environment variables with the key and the secret.
 ENV AWS_S3_URL=https://s3.amazonaws.com
+ENV EC2_METADATA_CREDENTIALS="http://169.254.169.254/latest/meta-data/iam/security-credentials"
 ENV AWS_S3_ACCESS_KEY_ID=
 ENV AWS_S3_SECRET_ACCESS_KEY=
-ENV AWS_S3_SECRET_ACCESS_KEY_FILE=
-ENV AWS_S3_AUTHFILE=
+ENV AWS_S3_SESSION_TOKEN=
 ENV AWS_S3_BUCKET=
+ENV USE_AWS_IAM_ROLE=
 
 # User and group ID of share owner
 ENV RUN_AS=

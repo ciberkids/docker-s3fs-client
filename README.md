@@ -56,23 +56,35 @@ directories available back to the host and recursively to other containers.
 
 This for using the session token
 ```Shell
-docker run -d --rm \
+aws-vault exec `profile` --
+docker run -it --rm \
     --device /dev/fuse \
     --cap-add SYS_ADMIN \
     --security-opt "apparmor=unconfined" \
-    --env AWS_S3_BUCKET="bucket" \
+    --env AWS_S3_BUCKET="hxdr-dev1-uploads-eu-west-1" \
     --env AWS_S3_ACCESS_KEY_ID="$(echo ${AWS_ACCESS_KEY_ID})" \
     --env AWS_S3_SECRET_ACCESS_KEY="$(echo ${AWS_SECRET_ACCESS_KEY})" \
     --env AWS_S3_SESSION_TOKEN="$(echo ${AWS_SESSION_TOKEN})" \
-    --env AWS_SECURITY_TOKEN="$(echo ${AWS_SECURITY_TOKEN})" \
-    --env AWS_DEFAULT_REGION="$(echo ${AWS_DEFAULT_REGION})" \
-    --env S3FS_DEBUG="0" \
+    --env S3FS_DEBUG="1" \
+    --env UID=$(id -u) \
+    --env GID=$(id -g) \
+    -v /mnt/s3/:/opt/s3fs/bucket/:rshared \
+    s3fs-client
+```
+on a ec2 istance with iam role
+```Shell
+docker run -it --rm \
+    --device /dev/fuse \
+    --cap-add SYS_ADMIN \
+    --security-opt "apparmor=unconfined" \
+    --env AWS_S3_BUCKET="hxdr-stg-uploads-eu-west-1" \
+    --env USE_AWS_IAM_ROLE="TRUE" \
+    --env S3FS_DEBUG="1" \
     --env UID=$(id -u) \
     --env GID=$(id -g) \
     -v /mnt/s3:/opt/s3fs/bucket:rshared \
     s3fs-client
 ```
-
 
 ```Shell
 docker build . -t s3fs-client
