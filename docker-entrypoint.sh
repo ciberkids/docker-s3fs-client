@@ -93,7 +93,7 @@ ls -la ${DEST}
 # Debug options
 export DEBUG_OPTS=
 if [ ${S3FS_DEBUG} = "1" ]; then
-    export DEBUG_OPTS="-d -d"
+    export DEBUG_OPTS="-f -d -o curldbg -o f2"
 fi
 
 # Additional S3FS options
@@ -109,6 +109,7 @@ fi
 echo "RUN AS: ${RUN_AS}"
 
 sudo -u ${RUN_AS} -E s3fs -o retries=20 \
+    ${DEBUG_OPTS} \
     -o uid=${UID} \
     -o gid=${GID} \
     -o allow_other \
