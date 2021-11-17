@@ -13,7 +13,7 @@ if [ -z "${AWS_S3_ACCESS_KEY_ID}" \
     exit
 fi
 
-if [ "${USE_AWS_IAM_ROLE}" -e "true" ]; then
+if [ "${USE_AWS_IAM_ROLE}" == "true" ]; then
     echo "Using IAM ROLE"
 
     export AWS_IAM_ROLE=$(curl ${EC2_METADATA_CREDENTIALS})
@@ -79,7 +79,7 @@ if [ ${UID} -gt 0 ]; then
     adduser -u ${UID} -D -G ${GROUP_NAME} ${UID}
     export RUN_AS=${UID}
     chown ${UID}:${GID} ${DEST}
-    chown ${UID}:${GID} ${AWS_S3_AUTHFILE}
+    # chown ${UID}:${GID} ${AWS_S3_AUTHFILE}
     chown ${UID}:${GID} /opt/s3fs
     chmod a+rx /opt/s3fs
     chmod a+rx ${DEST}
