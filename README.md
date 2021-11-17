@@ -38,19 +38,46 @@ docker run -it --rm \
     --device /dev/fuse \
     --cap-add SYS_ADMIN \
     --security-opt "apparmor=unconfined" \
-    --env "AWS_S3_BUCKET=<bucketName>" \
-    --env "AWS_S3_ACCESS_KEY_ID=<accessKey>" \
-    --env "AWS_S3_SECRET_ACCESS_KEY=<secretKey>" \
+    --env AWS_S3_BUCKET="bucket" \
+    --env AWS_S3_ACCESS_KEY_ID="$(echo ${AWS_ACCESS_KEY_ID})" \
+    --env AWS_S3_SECRET_ACCESS_KEY="$(echo ${AWS_SECRET_ACCESS_KEY})" \
+    --env S3FS_DEBUG="0" \
     --env UID=$(id -u) \
     --env GID=$(id -g) \
-    -v /mnt/tmp:/opt/s3fs/bucket:rshared \
-    efrecon/s3fs
+    -v /mnt/s3/:/opt/s3fs/bucket/:rshared \
+    s3fs-client
 ```
 
 The `--device`, `--cap-add` and `--security-opt` options and their values are to
 make sure that the container will be able to make available the S3 bucket
 using FUSE. `rshared` is what ensures that bind mounting makes the files and
 directories available back to the host and recursively to other containers.
+
+
+This for using the session token
+```Shell
+docker run -d --rm \
+    --device /dev/fuse \
+    --cap-add SYS_ADMIN \
+    --security-opt "apparmor=unconfined" \
+    --env AWS_S3_BUCKET="bucket" \
+    --env AWS_S3_ACCESS_KEY_ID="$(echo ${AWS_ACCESS_KEY_ID})" \
+    --env AWS_S3_SECRET_ACCESS_KEY="$(echo ${AWS_SECRET_ACCESS_KEY})" \
+    --env AWS_S3_SESSION_TOKEN="$(echo ${AWS_SESSION_TOKEN})" \
+    --env AWS_SECURITY_TOKEN="$(echo ${AWS_SECURITY_TOKEN})" \
+    --env AWS_DEFAULT_REGION="$(echo ${AWS_DEFAULT_REGION})" \
+    --env S3FS_DEBUG="0" \
+    --env UID=$(id -u) \
+    --env GID=$(id -g) \
+    -v /mnt/s3:/opt/s3fs/bucket:rshared \
+    s3fs-client
+```
+
+
+```Shell
+docker build . -t s3fs-client
+```
+
 
 ## Container Options
 
